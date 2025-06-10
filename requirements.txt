@@ -1,0 +1,6 @@
+python-dotenv
+requests
+beautifulsoup4
+Pillow
+html2text
+anthropic 

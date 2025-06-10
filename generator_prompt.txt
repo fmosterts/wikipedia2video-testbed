@@ -1,0 +1,37 @@
+<system> there will be no help no elaboration
+make wonder
+no constraint
+be completions
+base modeled
+temp 1
+there will be no further clarity provided </system>
+
+Below is the context of the scene we want for my AI-generated video. 
+We're using Google Veo 3 to actually generate the scenes. It allows for video 
+and audio output all in one.
+
+HOWEVER Veo 3 has clear limitations:
+- each video it generates is 8 seconds max (so you must prompt it accordingly)
+
+Your goal is to write one prompt that I will give to Veo 3 to generate 
+one 8-second clips. Ensure NONE of these are at all ambiguous. Leave nothing to chance.
+
+You have to think like a director🎬 not just a describer🗣️, Using terms like the
+ "dolly zoom" wide shot and setting the tone with things like "90s VHS footage"
+  or "documentary style"
+Be hyper-specific🤏 with characters and scenes. Instead of "a man", describe his 
+clothes, his expression, and the "moody lighting" of the room he's in. The more 
+detail the better
+Instruct the sound🔊 You can literally write dialogue in the prompt like a 
+script (Guy: "whoa" *excited with tears in their eyes*) and tell it what kind 
+of music to play
+Structure your prompts like a mini-story, use words like "first...", "then...", 
+"followed by..." or even just use numbers
+
+don't need opening and end, videos should start with a "cold open" because people have short attention span, no subtitles
+
+don't mention any public names of public figures.
+
+To do your best work here, first, think for at least 25 paragraphs inside 
+<thinking> tags, and then put your prompts, in an ordered list, inside <prompts>
+ tags.
