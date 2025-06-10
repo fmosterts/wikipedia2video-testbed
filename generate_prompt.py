@@ -80,38 +80,3 @@ class WikipediaMovieGenerator:
             return output_file
         except Exception as e:
             raise Exception(f"Error saving output file: {str(e)}")
-
-
-def main():
-    """Main function to run the movie prompt generator."""
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    parser = argparse.ArgumentParser(description="Generate a movie prompt from a Wikipedia markdown file.")
-    parser.add_argument("markdown_file", type=Path, help="Path to the markdown file.")
-    args = parser.parse_args()
-
-    try:
-        # Initialize the generator
-        generator = WikipediaMovieGenerator()
-        
-        # Process the file
-        logging.info("Processing: %s", args.markdown_file)
-        movie_prompt = generator.process_file(args.markdown_file)
-        
-        # Display the result
-        logging.info("\n" + "="*80)
-        logging.info("GENERATED MOVIE PROMPT")
-        logging.info("="*80)
-        logging.info(movie_prompt)
-        
-        # Save to file
-        generator.save_prompt(movie_prompt, args.markdown_file)
-        
-    except FileNotFoundError as e:
-        logging.error("Error: %s", e)
-        sys.exit(1)
-    except ValueError as e:
-        logging.error("Error: %s", e)
-        sys.exit(1)
-    except Exception as e:
-        logging.error("Unexpected error: %s", e)
-        sys.exit(1)

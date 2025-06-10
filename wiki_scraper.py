@@ -209,31 +209,3 @@ class WikipediaExtractor:
             'image_file': img_filename if img_url else None,
             'title': page_info['title']
         }
-
-
-def main():
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    parser = argparse.ArgumentParser(description='Extract Wikipedia page content as markdown and download main image')
-    parser.add_argument('page', help='Wikipedia page title or URL')
-        
-    args = parser.parse_args()
-    
-    extractor = WikipediaExtractor()
-    
-    try:
-        output_dir, clean_title = extractor.create_outputdir(args.page)
-        result = extractor.process_page(output_dir, clean_title)
-        logging.info("\n✅ Successfully processed: %s", result['title'])
-        logging.info("📄 Markdown: %s", result['markdown_file'])
-        if result['image_file']:
-            logging.info("🖼️  Image: %s", result['image_file'])
-        else:
-            logging.warning("🖼️  No main image found")
-            
-    except Exception as e:
-        logging.error("❌ Error: %s", e)
-        sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()
