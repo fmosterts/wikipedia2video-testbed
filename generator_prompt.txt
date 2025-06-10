@@ -31,6 +31,7 @@ Structure your prompts like a mini-story, use words like "first...", "then...",
 don't need opening and end, videos should start with a "cold open" because people have short attention span, no subtitles
 
 VERY IMPORTANT: don't mention any names of public figures or products in the prompt.
+VERY IMPORTNAT: the prompt needs to fully comply to Vertex AI Google usage policy. 
 
 To do your best work here, first, think for at least 25 paragraphs inside 
 <thinking> tags, and then put your prompts, in an ordered list, inside <prompts>

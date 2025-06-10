@@ -27,7 +27,7 @@ def main():
     token_url = os.getenv('TOKEN_URL')
 
     if not all([project_id, location_id, model_id, api_endpoint, token_url]):
-        logging.error("Missing one or more required environment variables.")
+        logging.error("Missing one or m ore required environment variables.")
         sys.exit(1)
 
     # Scrape Wikipedia
