@@ -17,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description="Wikipedia to Video Generator")
     parser.add_argument("wiki_url", help="The URL of the Wikipedia page to process.")
     parser.add_argument("--duration", type=int, default=8, help="Duration of the generated video in seconds.")
+    parser.add_argument("--video_count", type=int, default=1, help="Number of videos to generate.")
     args = parser.parse_args()
 
     project_id = os.getenv('PROJECT_ID')
@@ -45,7 +46,7 @@ def main():
 
     # Generate video
     video_gen = VideoGenerator(project_id, location_id, model_id, api_endpoint, token_url)
-    operation_id = video_gen.start_video_generation(prompt_path, scraper_result['image_file'], args.duration)
+    operation_id = video_gen.start_video_generation(prompt_path, scraper_result['image_file'], args.duration, args.video_count)
 
     if not operation_id:
         logging.error("Failed to start video generation.")

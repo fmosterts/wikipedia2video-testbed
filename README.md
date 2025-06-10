@@ -51,7 +51,7 @@ python main.py "https://en.wikipedia.org/wiki/Steve_Jobs"
 You can also specify the duration of the video in seconds (default is 10):
 
 ```bash
-python main.py "https://en.wikipedia.org/wiki/Steve_Jobs" --duration 15
+python main.py "https://en.wikipedia.org/wiki/Steve_Jobs" --duration 8 --video_count 1
 ```
 
 The generated files (markdown, prompt, and video) will be saved in the `data/<article-title>` directory.

@@ -38,7 +38,7 @@ class VideoGenerator:
             logging.error("Invalid JSON response from token service. Error: %s", e)
             return None
 
-    def start_video_generation(self, prompt_path, image_path, durationSeconds):
+    def start_video_generation(self, prompt_path, image_path, durationSeconds, output_count):
         """Start the video generation process."""
         if not self.token:
             self.fetch_token()
@@ -74,7 +74,7 @@ class VideoGenerator:
             ],
             "parameters": {
                 "aspectRatio": "16:9",
-                "sampleCount": 1,
+                "sampleCount": output_count,
                 "durationSeconds": durationSeconds,
                 "personGeneration": "allow_adult",
                 "enablePromptRewriting": True,
