@@ -9,6 +9,7 @@ import html2text
 import argparse
 import logging
 
+logging.basicConfig(level=logging.INFO)
 
 class WikipediaExtractor:
     def __init__(self):
@@ -23,7 +24,7 @@ class WikipediaExtractor:
             # Extract title from URL
             parsed = urlparse(url_or_title)
             title = parsed.path.split('/')[-1]
-            return unquote(title).replace('_', ' ')
+            return title
         return url_or_title
     
     def get_wikipedia_url(self, title):
@@ -47,21 +48,39 @@ class WikipediaExtractor:
         # Try to find the main infobox image first
         infobox = soup.find('table', class_='infobox')
         if infobox:
-            img = infobox.find('img')
-            if img and img.get('src'):
-                return img['src']
-        
-        # Look for the first image in the content area
+            img_tag = infobox.find('img')
+            if img_tag and img_tag.get('src'):
+                src = img_tag.get('src')
+                # Check for thumbnail URL and try to get full-size version
+                if '/thumb/' in src:
+                    # e.g. //.../thumb/a/a9/Example.jpg/220px-Example.jpg
+                    # becomes //.../a/a9/Example.jpg
+                    src = re.sub(r'(/thumb)(/.*)/[^/]*$', r'\2', src)
+                return src
+
+        # Look for the first image in the content area that meets size requirements
         content = soup.find('div', {'id': 'mw-content-text'})
         if content:
-            # Skip small icons and logos
             images = content.find_all('img')
             for img in images:
                 src = img.get('src', '')
-                if (img.get('width', 0) and 
-                    int(img.get('width', 0)) > 100 and
-                    not any(skip in src.lower() for skip in ['commons-logo', 'wikimedia', 'edit-icon'])):
-                    return src
+                
+                # Basic filter for unwanted images
+                if any(skip in src.lower() for skip in ['commons-logo', 'wikimedia', 'edit-icon']):
+                    continue
+                    
+                width_attr = img.get('width')
+                height_attr = img.get('height')
+
+                if width_attr and height_attr:
+                    try:
+                        width = int(width_attr)
+                        height = int(height_attr)
+                        if min(width, height) >= 300:
+                            return src
+                    except ValueError:
+                        # Ignore if width/height are not integer values
+                        pass
         
         return None
     
@@ -88,6 +107,13 @@ class WikipediaExtractor:
             
             # Convert to PNG using PIL
             with Image.open('temp_image') as img:
+                # Check image dimensions
+                width, height = img.size
+                if min(width, height) < 300:
+                    logging.warning(f"Image is too small ({width}x{height}), skipping.")
+                    os.remove('temp_image')
+                    return False
+                
                 # Convert to RGB if necessary (for images with transparency)
                 if img.mode in ('RGBA', 'LA', 'P'):
                     background = Image.new('RGB', img.size, (255, 255, 255))
@@ -178,7 +204,7 @@ class WikipediaExtractor:
         
         # Create safe filename
         safe_filename = re.sub(r'[^\w\s-]', '', page_info['title'])
-        safe_filename = re.sub(r'[-\s]+', '-', safe_filename).strip('-')
+        safe_filename = re.sub(r'[-\s]+', '_', safe_filename).strip('_')
         
         # Convert to markdown
         logging.info("Converting to markdown...")
@@ -202,10 +228,16 @@ class WikipediaExtractor:
         logging.info("Looking for main image...")
         img_url = self.extract_main_image(soup)
         img_filename = os.path.join(output_dir, f"{safe_filename}.png")
-        self.download_image(img_url, img_filename)
+        image_downloaded = self.download_image(img_url, img_filename)
         
         return {
             'markdown_file': md_filename,
-            'image_file': img_filename if img_url else None,
+            'image_file': img_filename if image_downloaded else None,
             'title': page_info['title']
         }
+
+if __name__ == "__main__":
+    wiki_url = "https://en.wikipedia.org/wiki/Valentino_Rossi"
+    extractor = WikipediaExtractor()
+    output_dir, clean_title = extractor.create_outputdir(wiki_url)
+    scraper_result = extractor.process_page(output_dir, clean_title)

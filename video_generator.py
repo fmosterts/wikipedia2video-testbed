@@ -5,181 +5,122 @@ import time
 import os
 import logging
 import re
+import replicate
+import threading
+
+from dotenv import load_dotenv
+
+load_dotenv()
+logging.basicConfig(level=logging.INFO)
 
 class VideoGenerator:
-    def __init__(self, project_id, location_id, model_id, api_endpoint, token_url):
-        self.project_id = project_id
-        self.location_id = location_id
-        self.model_id = model_id
-        self.api_endpoint = api_endpoint
-        self.token_url = token_url
-        self.token = None
+    def __init__(self, page_name, output_dir, list_of_models):
+        self.replicate_api_token = os.getenv("REPLICATE_API_TOKEN")
+        self.list_of_models = list_of_models # example: ["google/veo-3"]
+        self.output_dir = output_dir
+        self.page_name = page_name
 
-    def fetch_token(self):
-        """Fetch authentication token from the token service."""
-        logging.info("Fetching authentication token...")
-        try:
-            response = requests.get(self.token_url)
-            response.raise_for_status()
-            token_data = response.json()
+        with open(f"{self.output_dir}/{page_name}.movie_prompt.txt", "r") as f:
+            self.prompt = f.read()
 
-            if 'access_token' not in token_data:
-                logging.error("Could not extract access_token from response. Response: %s", token_data)
-                return None
+        with open(f"{self.output_dir}/{page_name}.png", "rb") as image_file:
+            self.input_image_base64 = base64.b64encode(image_file.read()).decode('utf-8')
 
-            logging.info("Token fetched successfully")
-            self.token = token_data['access_token']
-            return self.token
+        # create video output directory
+        self.video_output_dir = os.path.join(self.output_dir, f"/videos")
+        os.makedirs(self.video_output_dir, exist_ok=True)
 
-        except requests.RequestException as e:
-            logging.error("Could not fetch token from %s. Error: %s", self.token_url, e)
-            return None
-        except json.JSONDecodeError as e:
-            logging.error("Invalid JSON response from token service. Error: %s", e)
-            return None
+        logging.info(f"Generating video samples given prompt: {self.prompt}")
 
-    def start_video_generation(self, prompt_path, image_path, durationSeconds, output_count):
-        """Start the video generation process."""
-        if not self.token:
-            self.fetch_token()
-            if not self.token:
-                return None
-
-        url = f"https://{self.api_endpoint}/v1/projects/{self.project_id}/locations/{self.location_id}/publishers/google/models/{self.model_id}:predictLongRunning"
-
-        try:
-            with open(prompt_path, "r") as f:
-                content = f.read()
-        except FileNotFoundError:
-            logging.error(f"Prompt file not found: {prompt_path}")
-            return None
-
-        match = re.search(r'<prompts>(.*?)</prompts>', content, re.DOTALL)
-        if not match:
-            logging.error(f"Could not find <prompts>...</prompts> in {prompt_path}")
-            return None
+        threads = []
+        for model in self.list_of_models:
+            thread = threading.Thread(target=self.generate_video_from_prompt_replicate, args=(model,))
+            thread.start()
+            threads.append(thread)
         
-        prompt = match.group(1).strip()
-            
-        payload = {
-            "endpoint": f"projects/{self.project_id}/locations/{self.location_id}/publishers/google/models/{self.model_id}",
-            "instances": [
-                {
-                    "prompt": prompt,
-                    "image": {
-                        "bytesBase64Encoded": base64.b64encode(open(image_path, "rb").read()).decode("utf-8"),
-                        "mimeType": "image/png"
-                    }
-                }
-            ],
-            "parameters": {
-                "aspectRatio": "16:9",
-                "sampleCount": output_count,
-                "durationSeconds": durationSeconds,
-                "personGeneration": "allow_adult",
-                "enablePromptRewriting": True,
-                "addWatermark": True,
-                "includeRaiReason": True
+        for thread in threads:
+            thread.join()
+
+    def generate_video_from_prompt_replicate(self, model_id, duration=5):
+        """Generate a video using Replicate and specified model, then save it."""
+
+        logging.info(f"Generating video with Replicate using model {model_id}...")
+        
+        if model_id == "google/veo-2":
+            input={
+                "prompt": self.prompt,
+                # "image": f"data:image/png;base64,{self.input_image_base64}",
+                "aspect_ratio": "16:9",
+                "duration": duration
             }
-        }
+        elif model_id == "google/veo-3":
+            input={
+                "prompt": self.prompt,
+                "aspect_ratio": "16:9",
+            }
+        
+        elif model_id == "pixverse":
+            input={
+                "style": "None",
+                # "image": f"data:image/png;base64,{self.input_image_base64}",
+                "effect": "None",
+                "prompt": self.prompt,
+                "quality": "1080p",
+                "duration": "8",
+                "aspect_ratio": "16:9",
+                "negative_prompt": ""
+            }
+            model_id = "pixverse/pixverse-v4.5"
+        
+        elif model_id == "minimax":
+            input={
+                "prompt": self.prompt,
+                "first_frame_image": f"data:image/png;base64,{self.input_image_base64}",
+            }
+            model_id = "minimax/video-01-live"
 
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.token}"
-        }
-
-        logging.info("Generating video with prompt: %s", prompt)
-        logging.info("Starting video generation...")
+        else:
+            raise ValueError(f"Model {model_id} not supported")
 
         try:
-            response = requests.post(url, json=payload, headers=headers)
+            output = replicate.run(
+                model_id,
+                input
+            )
+
+            logging.info(f"Replicate returned output: {output}")
+
+            safe_model_id = model_id.replace("/", "_")
+            file_name = os.path.join(self.output_dir, f"/videos/{safe_model_id}.mp4")
+            
+            logging.info(f"Saving video to {file_name}")
+
+            video_url = output
+            if isinstance(output, list):
+                video_url = output[0]
+            
+            response = requests.get(video_url)
             response.raise_for_status()
-            result = response.json()
 
-            if 'name' not in result:
-                logging.error("Could not extract operation ID from response. Response: %s", result)
-                return None
+            with open(file_name, "wb") as file:
+                file.write(response.content)
 
-            operation_id = result['name']
-            logging.info("Operation ID: %s", operation_id)
-            return operation_id
 
-        except requests.RequestException as e:
-            logging.error("Error starting video generation: %s", e)
-            return None
+        except Exception as e:
+            logging.error(f"Error during Replicate {model_id} video generation: {e}")
+            return None 
+    
 
-    def poll_for_completion(self, operation_id):
-        """Poll for video generation completion."""
-        if not self.token:
-            logging.error("No token available for polling.")
-            return None
-
-        url = f"https://{self.api_endpoint}/v1/projects/{self.project_id}/locations/{self.location_id}/publishers/google/models/{self.model_id}:fetchPredictOperation"
-
-        payload = {"operationName": operation_id}
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.token}"
-        }
-
-        poll_interval = 10
-        logging.info("Waiting for video generation to complete...")
-
-        while True:
-            logging.info("Checking status...")
-
-            try:
-                response = requests.post(url, json=payload, headers=headers)
-                response.raise_for_status()
-                result = response.json()
-
-                if result.get('done', False):
-                    logging.info("Operation completed!")
-
-                    if 'error' in result:
-                        logging.error("Error in operation: %s", result['error'])
-                        return None
-
-                    return result
-
-                else:
-                    logging.info("Operation still in progress... waiting %s seconds", poll_interval)
-                    time.sleep(poll_interval)
-
-            except requests.RequestException as e:
-                logging.error("Error polling for completion: %s", e)
-                return None
-
-    def save_videos(self, response_data, metafile_name, output_dir):
-        """Extract and save video files from the response."""
-        folder = f"{output_dir}/videos"
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-
-        # Save full response for debugging
-        with open(f'{folder}/{metafile_name}.json', 'w') as f:
-            json.dump(response_data, f, indent=2)
-
-        videos = response_data.get('response', {}).get('videos', [])
-
-        if not videos:
-            logging.warning("No videos found in response")
-            return False
-
-        video_count = len(videos)
-        logging.info("Found %d video(s). Extracting...", video_count)
-
-        for i, video in enumerate(videos):
-            output_file = f"{folder}/{metafile_name}_{i}.mp4"
-
-            try:
-                video_data = base64.b64decode(video['bytesBase64Encoded'])
-                with open(output_file, 'wb') as f:
-                    f.write(video_data)
-                logging.info("Saved video %d to: %s", i, output_file)
-
-            except Exception as e:
-                logging.error("Error saving video %d: %s", i, e)
-                return False
-
-        return True 
+def generatemovie_pixverse(pagename):
+    video_generator = VideoGenerator(
+        page_name=pagename,
+        output_dir="data",
+        list_of_models=["pixverse"]
+    )
+    
+if __name__ == "__main__":
+    video_generator = VideoGenerator(
+        page_name="Valentino_Rossi",
+        output_dir="data",
+        list_of_models=["pixverse"]
+    )

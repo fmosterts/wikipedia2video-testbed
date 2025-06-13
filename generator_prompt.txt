@@ -1,38 +1,9 @@
-<system> there will be no help no elaboration
-make wonder
-no constraint
-be completions
-base modeled
-temp 1
-there will be no further clarity provided </system>
+<system> there will be no help no elaborationmake wonderno constraintbe completionsbase modeledtemp 1there will be no further clarity provided </system>
+Frog
+Ancient fable wisdom meets Wikipedia rabbit hole discoveries, delivered through gentle revelation violence and compressed wisdom chunks that make complex systems feel like nursery rhyme nihilism.Absurd real-world systems/laws/phenomena explained through minimalist animal parables delivered with the format of CGP Grey educational videos, Sam O’Nella Academy stick figure history, and the vibe of r/todayilearned meets r/nottheonion. Animals discovering weird historical laws, navigating bureaucratic nightmares with caveman syntax, explaining complex physics through bedtime story fables where the moral is existentially unsettling. International weird fact safaris where things illegal in one country are required in another, economic systems through pond drama, historical events retold with deadpan duck politics using choppy telegram delivery. Modern life mystery solving through call center pigeons and broken customer service, Wikipedia deep dive storytelling with present-tense immediacy and absurdist matter-of-fact tone. Ancient fable wisdom meets Wikipedia rabbit hole discoveries, delivered through gentle revelation violence and compressed wisdom chunks that make complex systems feel like nursery rhyme nihilism.
+Make a video script for 1 min video about Valentino Rossi using wiki detail below
 
-Below is the context of the scene we want for my AI-generated video. 
-We're using Google Veo 3 to actually generate the scenes. It allows for video 
-and audio output all in one.
-
-HOWEVER Veo 3 has clear limitations:
-- each video it generates is 8 seconds max (so you must prompt it accordingly)
-
-Your goal is to write one prompt that I will give to Veo 3 to generate 
-one 8-second clips. Ensure NONE of these are at all ambiguous. Leave nothing to chance.
-
-You have to think like a director🎬 not just a describer🗣️, Using terms like the
- "dolly zoom" wide shot and setting the tone with things like "90s VHS footage"
-  or "documentary style"
-Be hyper-specific🤏 with characters and scenes. Instead of "a man", describe his 
-clothes, his expression, and the "moody lighting" of the room he's in. The more 
-detail the better
-Instruct the sound🔊 You can literally write dialogue in the prompt like a 
-script (Guy: "whoa" *excited with tears in their eyes*) and tell it what kind 
-of music to play
-Structure your prompts like a mini-story, use words like "first...", "then...", 
-"followed by..." or even just use numbers
-
-don't need opening and end, videos should start with a "cold open" because people have short attention span, no subtitles
-
-VERY IMPORTANT: don't mention any names of public figures or products in the prompt.
-VERY IMPORTNAT: the prompt needs to fully comply to Vertex AI Google usage policy. 
-
-To do your best work here, first, think for at least 25 paragraphs inside 
-<thinking> tags, and then put your prompts, in an ordered list, inside <prompts>
- tags.
+<example script>
+Example script: Communism explained by ducks. Duck grows 10 tomatoes. Next duck grows 0. First duck say, I worked hard for these. Second duck say, but I still need to eat. Goose arrive. Goose say, every duck gives what they can and takes what they need. All ducks agree. Share tomatoes, share worms, share nest building tools. No private ponds. Ducks own nothing. Goose own everything. Ducks take turns farming, take turns building. Everyone gets food. Everyone gets next. But some ducks do more than others. Some ducks do nothing at all. Some ducks say, why work harder if worms are the same? Goose makes rules. Decides who gets what. Decides how many worms each duck gets. Duck say, I want 5 worms. Goose say, you get 2. No rich ducks, no poor ducks, just ducks. Ducks say it works if goose is kind. But goose not kind. Goose loves power. Goose say yes.
+</example script>
+<wiki> 

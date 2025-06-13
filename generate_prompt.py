@@ -10,6 +10,7 @@ import argparse
 from dotenv import load_dotenv
 load_dotenv()
 
+logging.basicConfig(level=logging.INFO)
 
 class WikipediaMovieGenerator:
     def __init__(self, api_key: Optional[str] = None):
@@ -80,3 +81,10 @@ class WikipediaMovieGenerator:
             return output_file
         except Exception as e:
             raise Exception(f"Error saving output file: {str(e)}")
+
+
+if __name__ == "__main__":
+    file = "data/Valentino_Rossi/Valentino_Rossi.md"                      
+    prompt_generator = WikipediaMovieGenerator()
+    prompt = prompt_generator.process_file(file)
+    prompt_path = prompt_generator.save_prompt(prompt, file)
