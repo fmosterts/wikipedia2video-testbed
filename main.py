@@ -35,7 +35,7 @@ def main():
     prompt = prompt_generator.process_file(scraper_result['markdown_file'])
     prompt_path = prompt_generator.save_prompt(prompt, scraper_result['markdown_file'])
 
-    if args.generate_video:
+    if args.generate_video == True:
         # Generate video
         video_generator = VideoGenerator(
             page_name=clean_title,

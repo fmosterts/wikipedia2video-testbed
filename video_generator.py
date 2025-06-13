@@ -27,7 +27,7 @@ class VideoGenerator:
             self.input_image_base64 = base64.b64encode(image_file.read()).decode('utf-8')
 
         # create video output directory
-        self.video_output_dir = os.path.join(self.output_dir, f"/videos")
+        self.video_output_dir = os.path.join(self.output_dir, f"videos")
         os.makedirs(self.video_output_dir, exist_ok=True)
 
         logging.info(f"Generating video samples given prompt: {self.prompt}")
