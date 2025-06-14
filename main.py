@@ -18,22 +18,24 @@ def main():
     parser.add_argument("wiki_url", help="The URL of the Wikipedia page to process.")
     parser.add_argument("--duration", type=int, default=8, required=False, help="Duration of the generated video in seconds.")
     parser.add_argument("--model_list", type=list, default=["minimax"], required=False, help="Model to use for video generation.") 
+    parser.add_argument("--generate_prompt", type=bool, default=False, required=False, help="Generate prompt.")
     parser.add_argument("--generate_video", type=bool, default=False, required=False, help="Generate video.")
-    
+    parser.add_argument("--generate_image", type=bool, default=False, required=False, help="Generate image.")
     args = parser.parse_args()
 
-    # Scrape Wikipedia
-    extractor = WikipediaExtractor()
-    output_dir, clean_title = extractor.create_outputdir(args.wiki_url)
-    scraper_result = extractor.process_page(output_dir, clean_title)
+    if args.generate_prompt == True:
+        # Scrape Wikipedia
+        extractor = WikipediaExtractor()
+        output_dir, clean_title = extractor.create_outputdir(args.wiki_url)
+        scraper_result = extractor.process_page(output_dir, clean_title)
 
-    if not scraper_result['image_file']:
-        logging.error("Could not download an image from the Wikipedia page. Exiting.")
+        if not scraper_result['image_file']:
+            logging.error("Could not download an image from the Wikipedia page. Exiting.")
 
-    # Generate prompt
-    prompt_generator = WikipediaMovieGenerator()
-    prompt = prompt_generator.process_file(scraper_result['markdown_file'])
-    prompt_path = prompt_generator.save_prompt(prompt, scraper_result['markdown_file'])
+        # Generate prompt
+        prompt_generator = WikipediaMovieGenerator()
+        prompt = prompt_generator.process_file(scraper_result['markdown_file'])
+        prompt_path = prompt_generator.save_prompt(prompt, scraper_result['markdown_file'])
 
     if args.generate_video == True:
         # Generate video
