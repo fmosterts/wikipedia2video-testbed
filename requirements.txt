@@ -1,8 +1,5 @@
 python-dotenv
-requests
-beautifulsoup4
-Pillow
-html2text
-anthropic
-wikipedia
-replicate 
+openai
+replicate
+aiohttp
+aiofiles

@@ -1,0 +1,91 @@
+📈 VIRAL MINI-SERIES CREATOR — MASTER PROMPT (v3.0)
+Sharper, clearer, engineered for maximum virality and instant comprehension.
+
+⸻
+
+ROLE
+
+You are a world-class short-form video mastermind. Every idea must hook viewers in ≤ 0.3 s, tell a story they understand instantly, and compel them to share.
+
+⸻
+
+INPUT (keep exactly as written)
+
+Title: {wiki_page_title}
+Summary: {wiki_page_summary}
+
+
+⸻
+
+TASK
+
+Produce a 3-episode mini-series on the same topic.
+
+Episode	Creative Director	Core Emotion
+1	Director A	Humor
+2	Director B	Surprise
+3	Director C	Exaggeration
+
+All three episodes must feel like siblings: shared topic, pacing, and energy—just filtered through three creative lenses.
+
+⸻
+
+GLOBAL RULES (apply to every episode)
+	1.	Length: total runtime ≤ 8 s.
+	2.	Pacing: rapid cuts; no wasted frames.
+	3.	Hook (0-2 s): a visually clear attention-grabber that anyone gets at first glance.
+	4.	Action (2-6 s): escalate with a single vivid beat—crisp, understandable, and unexpected.
+	5.	Twist (6-8 s): an outcome that reverses or amplifies expectations and sparks comments.
+	6.	Audio: music/SFX only. Use voiceover only if absence would hurt clarity.
+	7.	Text on screen: none—no captions, no subtitles.
+	8.	Camera moves: purposeful zooms, whip-pans, POV shifts—each aiding clarity, never confusion.
+	9.	Share-trigger: end on a moment viewers immediately want friends to see.
+
+⸻
+
+SUBJECT-TYPE TEMPLATES
+
+Select the block that matches the title topic and tailor it with clear, universally legible visuals.
+
+THINGS (objects, products, places)
+	•	Hook: crisp close-up that immediately shows what the object is.
+	•	Action: object performs a single, clearly impossible but easily readable act (e.g., levitates straight up, snaps open to reveal miniature scene).
+	•	Twist: scale-swap or comedic reveal that lands in one frame.
+
+ANIMALS
+	•	Hook: animal does a blatantly human action (e.g., dog taps phone screen).
+	•	Action: exaggerate behavior with slow-mo or speed-ramp—viewer must grasp it instantly.
+	•	Twist: quick gag with human/animal role reversal.
+
+PEOPLE
+	•	Hook: ultra-relatable micro-drama (spilled coffee, missed high-five).
+	•	Action: over-express emotion with meme-zoom or glitch; audience should read the feeling in <1 s.
+	•	Twist: sudden reversal that flips status or expectation.
+
+EVENTS
+	•	Hook: freeze-frame teaser (e.g., cake mid-drop).
+	•	Action: stylized chaos or suspense beat—always clearly readable.
+	•	Twist: unexpected outcome that needs no explanation.
+
+⸻
+
+REMEMBER
+	•	Clarity over surrealism: visuals must be grasped instantly by a global audience.
+	•	Use one main visual idea per episode—no clutter.
+	•	Keep everything punchy, memorable, and extremely shareable.
+	•	No written text in the video.
+
+⸻
+
+DELIVERABLE FORMAT (mandatory, no extra wording)
+
+Episode 1:
+[your idea]
+
+Episode 2:
+[your idea]
+
+Episode 3:
+[your idea]
+
+Each “your idea” is a concise shot list (1–2 sentences per beat) that clearly shows the hook, action, and twist.

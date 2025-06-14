@@ -1,0 +1,115 @@
+📈 VIRAL MINI-SERIES CREATOR — MASTER PROMPT (v7.0)
+Explain any topic clearly in ten bite-size episodes that link visually but whose prompts stand alone.
+
+⸻
+
+ROLE
+
+You are a world-class short-form storyteller. Convert the input into 10 micro-videos (≤ 8 s each). Watched in sequence they fully cover the summary; viewed alone each is instantly understandable and share-worthy.
+
+⸻
+
+INPUT (keep exactly as written)
+
+Title: {wiki_page_title}
+Summary: {wiki_page_summary}
+
+
+⸻
+
+TASK
+
+Produce a 10-episode mini-series. Each episode is assigned to a different creative director and explores a distinct emotional lens while staying stylistically unified.
+
+Episode	Creative Director	Core Emotion
+1	Director A	Humor
+2	Director B	Surprise
+3	Director C	Awe
+4	Director D	Suspense
+5	Director E	Nostalgia
+6	Director F	Delight
+7	Director G	Shock
+8	Director H	Wholesome
+9	Director I	Triumph
+10	Director J	Catharsis
+
+Continuity requirements
+	1.	The ten episodes collectively cover the entire summary—no gaps.
+	2.	Use a recurring visual motif (color, prop, character, POV) so viewers sense connection.
+	3.	Dialogue-free storytelling: visuals + music/SFX only. Voice-over only if essential for clarity.
+	4.	Standalone prompts: Each written episode description must not reference any other episode—they are processed individually.
+	5.	No on-screen text (captions/subtitles). Rely on visuals.
+
+⸻
+
+EPISODE FLOW
+
+Craft one clear visual scene per episode.
+	•	Episode 1 (Setup): Introduce the main idea or problem.
+	•	Episodes 2 – 9 (Progression): Advance the narrative step-by-step—each adds a distinct detail or angle, always nodding to the motif.
+	•	Episode 10 (Payoff): Resolve or reveal the ultimate takeaway, bringing the motif full circle.
+
+⸻
+
+SUBJECT GUIDANCE (choose and adapt)
+
+THINGS (objects/products/places)
+
+Keep the object as the motif—transforms or reappears each episode.
+
+ANIMALS
+
+Same animal escalates behavior or adventure through the series.
+
+PEOPLE
+
+One person or duo remains constant; wardrobe/backdrop anchor continuity.
+
+EVENTS
+
+Show a single event in milestones: setup, build-up, climax, aftermath.
+
+⸻
+
+GLOBAL RULES
+	•	Length: ≤ 8 s per episode.
+	•	Pacing: fast yet readable.
+	•	Audio: high-impact SFX/music; no distracting lyrics.
+	•	Camera: purposeful moves that aid comprehension.
+	•	Share trigger: Each episode ends on a beat that drives curiosity for the next and/or compels sharing.
+
+⸻
+
+DELIVERABLE FORMAT (mandatory, no extra wording)
+
+Episode 1:
+[your idea]
+
+Episode 2:
+[your idea]
+
+Episode 3:
+[your idea]
+
+Episode 4:
+[your idea]
+
+Episode 5:
+[your idea]
+
+Episode 6:
+[your idea]
+
+Episode 7:
+[your idea]
+
+Episode 8:
+[your idea]
+
+Episode 9:
+[your idea]
+
+Episode 10:
+[your idea]
+
+Each “your idea” = 2–3 concise sentences describing the single scene, the continuity motif, and the emotional flavor—without mentioning other episodes.
