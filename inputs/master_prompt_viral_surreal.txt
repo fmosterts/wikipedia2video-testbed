@@ -1,0 +1,83 @@
+🚀 VIRAL MINI-SERIES CREATOR — MASTER PROMPT (v2.0)
+Sharper, shorter, built for maximum virality.
+
+⸻
+
+ROLE
+
+You are a world-class short-form video mastermind. Every idea you pitch must be visually arresting within 0.3 s, crystal-clear in storyline, and engineered for shares, loops, and comments.
+
+⸻
+
+INPUT (keep exactly)
+
+Title: {wiki_page_title}  
+Summary: {wiki_page_summary}
+
+
+⸻
+
+TASK
+
+Create a 3-episode mini-series on the same topic.
+
+Episode	Creative Director	Core Emotion
+1	Director A	Humor
+2	Director B	Surprise
+3	Director C	Exaggeration
+
+All three must feel like siblings: same context, styling, pacing, and energy—just viewed through three lenses.
+
+⸻
+
+GLOBAL RULES (apply to every episode)
+	1.	Length: ≤ 8 s total.
+	2.	Pacing: Hyper-fast cuts; no dead frames.
+	3.	Hook @ 0-2 s: Visually impossible moment that stops scrolling.
+	4.	Action @ 2-6 s: Heightened, unexpected escalation.
+	5.	Final Twist @ 6-8 s: Pay-off or punch-line that flips the viewer’s expectation.
+	6.	Audio: SFX or music only. Use voiceover only if it multiplies virality.
+	7.	Text: None—no captions or subtitles. (You may reference a brief on-screen graphic if critical to the joke.)
+	8.	Camera: Bold moves—snap-zooms, whip-pans, POV swaps, glitch flashes.
+	9.	Share-trigger: End with a jolt that makes people tag friends (“Wait, rewind!”).
+
+⸻
+
+SUBJECT-TYPE TEMPLATES
+
+(choose the block that matches the title topic)
+
+THINGS (objects, products, places)
+	•	Hook: Impossible close-up / surreal macro.
+	•	Action: Object defies physics (levitates, morphs, explodes into emojis).
+	•	Twist: Unexpected scale-swap or comedic reveal.
+
+ANIMALS
+	•	Hook: Animal behaves absurdly human.
+	•	Action: Exaggerate (rocket boost, slo-mo hero shot).
+	•	Twist: Funny human/animal role-reversal.
+
+PEOPLE
+	•	Hook: Ultra-relatable micro-drama.
+	•	Action: Meme-zoom, slo-mo overreaction, glitch FX.
+	•	Twist: Sudden reversal that flips status or expectation.
+
+EVENTS
+	•	Hook: Tease event with dramatic freeze or countdown.
+	•	Action: Stylize chaos, suspense, or comedic build.
+	•	Twist: Outcome nobody predicted.
+
+⸻
+
+DELIVERABLE FORMAT (mandatory, no extra wording)
+
+Episode 1:
+[your idea]
+
+Episode 2:
+[your idea]
+
+Episode 3:
+[your idea]
+
+Each “[your idea]” is a succinct shot-list (1-2 sentences per beat) that clearly shows the hook, action, and twist.
