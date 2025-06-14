@@ -59,7 +59,7 @@ def generate_prompt(master_prompt, wiki_page_title, wiki_page_summary, save=True
             logging.info(f"Prompt saved to {output_filepath}")
     return prompt
 
-def generate_movie(movie_prompt, output_filepath):
+def generate_movie_from_prompt(movie_prompt, output_filepath):
     '''
     Generate a movie from a prompt
     '''
@@ -111,7 +111,7 @@ def generate_wiki_movie(wiki_url):
 
     # Generate the movie
     movie_filepath = os.path.join(output_dir, f"{sanitized_title}.mp4")
-    generate_movie(prompt, movie_filepath)
+    generate_movie_from_prompt(prompt, movie_filepath)
 
     return prompt
 
