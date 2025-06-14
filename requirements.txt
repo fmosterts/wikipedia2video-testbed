@@ -6,3 +6,4 @@ html2text
 anthropic
 wikipedia
 replicate 
+openai==0.28

@@ -1,50 +1,120 @@
+import logging
+import requests
+import os
+import openai
+import replicate
+
 from dotenv import load_dotenv
+from urllib.parse import urlparse
+
+logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
-import argparse
-import sys
-import os
-import logging
+def clean_url(url_or_title):
+    """Convert Wikipedia title or URL to a clean page title."""
+    if url_or_title.startswith('http'):
+        # Extract title from URL
+        parsed = urlparse(url_or_title)
+        title = parsed.path.split('/')[-1]
+        return title
+    else:
+        logging.error(f"Invalid URL: {url_or_title}")
 
-from wiki_scraper import WikipediaExtractor
-from generate_prompt import WikipediaMovieGenerator
-from video_generator import VideoGenerator
+def get_summary(wiki_url):
+    '''
+    Get the summary of a Wikipedia page
+    '''
+    title = clean_url(wiki_url)
+    summary_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{title}"
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.info(f"Fetching summary for {title}")
+    try:
+        response = requests.get(summary_url)
+        response.raise_for_status()
+        logging.info(f"Summary fetched: {response.json()}")
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error fetching summary: {e}")
+        return None
 
-def main():
-    parser = argparse.ArgumentParser(description="Wikipedia to Video Generator")
-    parser.add_argument("wiki_url", help="The URL of the Wikipedia page to process.")
-    parser.add_argument("--duration", type=int, default=8, required=False, help="Duration of the generated video in seconds.")
-    parser.add_argument("--model_list", type=list, default=["minimax"], required=False, help="Model to use for video generation.") 
-    parser.add_argument("--generate_prompt", type=bool, default=False, required=False, help="Generate prompt.")
-    parser.add_argument("--generate_video", type=bool, default=False, required=False, help="Generate video.")
-    parser.add_argument("--generate_image", type=bool, default=False, required=False, help="Generate image.")
-    args = parser.parse_args()
+def generate_prompt(master_prompt, wiki_page_title, wiki_page_summary, save=True, output_filepath=None):
+    '''
+    Generate a prompt for the movie given a master prompt, wiki page title, and wiki page summary
+    '''
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    logging.info(f"Generating prompt for {wiki_page_title}")
+    response = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": master_prompt},
+            {"role": "user", "content": f"Title: {wiki_page_title}\nSummary: {wiki_page_summary}"}
+        ]
+    )
+    logging.info(f"Prompt generated: {response.choices[0].message.content}")
+    prompt = response.choices[0].message.content
 
-    if args.generate_prompt == True:
-        # Scrape Wikipedia
-        extractor = WikipediaExtractor()
-        output_dir, clean_title = extractor.create_outputdir(args.wiki_url)
-        scraper_result = extractor.process_page(output_dir, clean_title)
+    if save and output_filepath:
+        with open(output_filepath, 'w', encoding='utf-8') as file:
+            file.write(prompt)
+            logging.info(f"Prompt saved to {output_filepath}")
+    return prompt
 
-        if not scraper_result['image_file']:
-            logging.error("Could not download an image from the Wikipedia page. Exiting.")
-
-        # Generate prompt
-        prompt_generator = WikipediaMovieGenerator()
-        prompt = prompt_generator.process_file(scraper_result['markdown_file'])
-        prompt_path = prompt_generator.save_prompt(prompt, scraper_result['markdown_file'])
-
-    if args.generate_video == True:
-        # Generate video
-        video_generator = VideoGenerator(
-            page_name=clean_title,
-            output_dir=output_dir,
-            list_of_models=args.model_list
+def generate_movie(movie_prompt, output_filepath):
+    '''
+    Generate a movie from a prompt
+    '''
+    model_id = "pixverse/pixverse-v4.5"
+    input={
+        "prompt": movie_prompt    }
+    try:
+        logging.info(f"Generating movie with prompt: {movie_prompt}")
+        output = replicate.run(
+            model_id,
+            input
         )
 
+        logging.info(f"Replicate returned output: {output}")
+
+        video_url = output
+        if isinstance(output, list):
+            video_url = output[0]
+        
+        response = requests.get(video_url)
+        response.raise_for_status()
+
+        with open(output_filepath, "wb") as file:
+            file.write(response.content)
+        logging.info(f"Movie saved to {output_filepath}")
+
+    except Exception as e:
+        logging.error(f"Error during Replicate {model_id} video generation: {e}")
+        return None 
+
+def generate_wiki_movie(wiki_url):
+    '''
+    Get the movie prompt from the summary
+    '''
+    # Get the wiki page summary and title
+    wiki_page_metadata = get_summary(wiki_url)
+    title, wikipedia_page_summary = wiki_page_metadata["title"], wiki_page_metadata["extract"]
+    
+    sanitized_title = title.replace(' ', '_')
+    output_dir = os.path.join("output", sanitized_title)
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Get the movie prompt from the generator prompt + wiki page summary
+    with open("generator_prompt.txt", 'r', encoding='utf-8') as file:
+        master_prompt = file.read()
+    
+    prompt_filepath = os.path.join(output_dir, f"{sanitized_title}.txt")
+    prompt = generate_prompt(master_prompt, title, wikipedia_page_summary, output_filepath=prompt_filepath)
+
+    # Generate the movie
+    movie_filepath = os.path.join(output_dir, f"{sanitized_title}.mp4")
+    generate_movie(prompt, movie_filepath)
+
+    return prompt
 
 if __name__ == "__main__":
-    main()
+    wiki_url = "https://en.wikipedia.org/wiki/The_Lord_of_the_Rings"
+    generate_wiki_movie(wiki_url)
