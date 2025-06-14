@@ -1,8 +1,10 @@
 import logging
-import requests
 import os
 import openai
 import replicate
+import asyncio
+import aiohttp
+import aiofiles
 
 from dotenv import load_dotenv
 from urllib.parse import urlparse
@@ -18,9 +20,9 @@ def clean_url(url_or_title):
         title = parsed.path.split('/')[-1]
         return title
     else:
-        logging.error(f"Invalid URL: {url_or_title}")
+        return url_or_title
 
-def get_summary(wiki_url):
+async def get_summary(session: aiohttp.ClientSession, wiki_url):
     '''
     Get the summary of a Wikipedia page
     '''
@@ -29,49 +31,58 @@ def get_summary(wiki_url):
 
     logging.info(f"Fetching summary for {title}")
     try:
-        response = requests.get(summary_url)
-        response.raise_for_status()
-        logging.info(f"Summary fetched: {response.json()}")
-        return response.json()
-    except requests.exceptions.RequestException as e:
+        async with session.get(summary_url) as response:
+            response.raise_for_status()
+            data = await response.json()
+            logging.info(f"Summary for {title} fetched")
+            return data
+    except aiohttp.ClientError as e:
         logging.error(f"Error fetching summary: {e}")
         return None
 
-def generate_prompt(master_prompt, wiki_page_title, wiki_page_summary, save=True, output_filepath=None):
+
+async def generate_prompt(master_prompt, wiki_page_title, wiki_page_summary, save=True, output_filepath=None):
     '''
     Generate a prompt for the movie given a master prompt, wiki page title, and wiki page summary
     '''
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-    logging.info(f"Generating prompt for {wiki_page_title}")
-    response = openai.ChatCompletion.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": master_prompt},
-            {"role": "user", "content": f"Title: {wiki_page_title}\nSummary: {wiki_page_summary}"}
-        ]
-    )
-    logging.info(f"Prompt generated: {response.choices[0].message.content}")
-    prompt = response.choices[0].message.content
+    client = openai.AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    
+    try:
+        logging.info(f"Generating prompt for {wiki_page_title}")
+        
+        response = await client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": master_prompt},
+                {"role": "user", "content": f"Title: {wiki_page_title}\nSummary: {wiki_page_summary}"}
+            ]
+        )
+        
+        prompt = response.choices[0].message.content
+        logging.info(f"Prompt generated: {prompt}")
 
-    if save and output_filepath:
-        with open(output_filepath, 'w', encoding='utf-8') as file:
-            file.write(prompt)
-            logging.info(f"Prompt saved to {output_filepath}")
-    return prompt
+        if save and output_filepath:
+            async with aiofiles.open(output_filepath, 'w', encoding='utf-8') as file:
+                await file.write(prompt)
+                logging.info(f"Prompt saved to {output_filepath}")
 
-def generate_movie_from_prompt(movie_prompt, output_filepath):
+        return prompt
+    
+    except Exception as e:
+        logging.error(f"Error generating prompt: {e}")
+        raise
+
+async def generate_movie_from_prompt(session: aiohttp.ClientSession, movie_prompt, output_filepath):
     '''
     Generate a movie from a prompt
     '''
     model_id = "pixverse/pixverse-v4.5"
-    input={
-        "prompt": movie_prompt    }
+    input_data={
+        "prompt": movie_prompt
+    }
     try:
         logging.info(f"Generating movie with prompt: {movie_prompt}")
-        output = replicate.run(
-            model_id,
-            input
-        )
+        output = await asyncio.to_thread(replicate.run, model_id, input=input_data)
 
         logging.info(f"Replicate returned output: {output}")
 
@@ -79,23 +90,26 @@ def generate_movie_from_prompt(movie_prompt, output_filepath):
         if isinstance(output, list):
             video_url = output[0]
         
-        response = requests.get(video_url)
-        response.raise_for_status()
+        async with session.get(video_url) as response:
+            response.raise_for_status()
 
-        with open(output_filepath, "wb") as file:
-            file.write(response.content)
-        logging.info(f"Movie saved to {output_filepath}")
+            async with aiofiles.open(output_filepath, "wb") as file:
+                await file.write(await response.read())
+            logging.info(f"Movie saved to {output_filepath}")
 
     except Exception as e:
         logging.error(f"Error during Replicate {model_id} video generation: {e}")
         return None 
 
-def generate_wiki_movie(wiki_url):
+async def generate_wiki_movie(session: aiohttp.ClientSession, wiki_url):
     '''
     Get the movie prompt from the summary
     '''
     # Get the wiki page summary and title
-    wiki_page_metadata = get_summary(wiki_url)
+    wiki_page_metadata = await get_summary(session, wiki_url)
+    if not wiki_page_metadata:
+        return None
+        
     title, wikipedia_page_summary = wiki_page_metadata["title"], wiki_page_metadata["extract"]
     
     sanitized_title = title.replace(' ', '_')
@@ -103,18 +117,30 @@ def generate_wiki_movie(wiki_url):
     os.makedirs(output_dir, exist_ok=True)
 
     # Get the movie prompt from the generator prompt + wiki page summary
-    with open("generator_prompt.txt", 'r', encoding='utf-8') as file:
-        master_prompt = file.read()
+    try:
+        async with aiofiles.open("generator_prompt.txt", 'r', encoding='utf-8') as file:
+            master_prompt = await file.read()
+    except FileNotFoundError:
+        logging.error("generator_prompt.txt not found. Please create it.")
+        return None
     
     prompt_filepath = os.path.join(output_dir, f"{sanitized_title}.txt")
-    prompt = generate_prompt(master_prompt, title, wikipedia_page_summary, output_filepath=prompt_filepath)
+    prompt = await generate_prompt(master_prompt, title, wikipedia_page_summary, output_filepath=prompt_filepath)
 
     # Generate the movie
     movie_filepath = os.path.join(output_dir, f"{sanitized_title}.mp4")
-    generate_movie_from_prompt(prompt, movie_filepath)
+    await generate_movie_from_prompt(session, prompt, movie_filepath)
 
     return prompt
 
+async def main():
+    wiki_url_list = ["https://en.wikipedia.org/wiki/The_Lord_of_the_Rings", 
+                     "https://en.wikipedia.org/wiki/The_Hobbit"]
+    
+    async with aiohttp.ClientSession() as session:
+        tasks = [generate_wiki_movie(session, wiki_url) for wiki_url in wiki_url_list]
+        await asyncio.gather(*tasks)
+
+
 if __name__ == "__main__":
-    wiki_url = "https://en.wikipedia.org/wiki/The_Lord_of_the_Rings"
-    generate_wiki_movie(wiki_url)
+    asyncio.run(main())

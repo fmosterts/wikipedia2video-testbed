@@ -1,9 +1,5 @@
 python-dotenv
-requests
-beautifulsoup4
-Pillow
-html2text
-anthropic
-wikipedia
-replicate 
-openai==0.28
+openai
+replicate
+aiohttp
+aiofiles
