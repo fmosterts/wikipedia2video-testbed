@@ -59,8 +59,8 @@ The generated videos will be saved in the `output/` directory, organized by arti
 ## How it works
 
 1.  **Fetch Summary**: For each Wikipedia URL, it fetches the page summary using the Wikipedia REST API.
-2.  **Generate Prompt**: It uses a "master prompt" (a template configurable via inputs dir) and the Wikipedia summary to generate a detailed script for the video using an OpenAI model. The script is broken down into episodes.
-3.  **Generate Video Episodes**: For each episode in the script, it calls the Replicate API to generate a video clip using the specified text-to-video model.
+2.  **Generate Prompt**: It uses a "master prompt" (a template configurable via inputs dir) and the Wikipedia summary to generate a detailed script for the video using an OpenAI model. The script is broken down into episodes. Via `prompt-model` arg the user can config which OpenAI model to use to generate the movie prompt. 
+3.  **Generate Video Episodes**: For each episode in the script, it calls the Replicate API to generate a video clip using the specified text-to-video model. Via `movie-model` arg the user can config which Replicate model to use to generate the movie prompt. 
 4.  **Combine Videos**: After all episode clips are generated, it uses `moviepy` to concatenate them into a single final video.
 
 ## Contributing
